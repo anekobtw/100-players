@@ -1,0 +1,38 @@
+{
+	"geode": "4.6.3",
+	"gd": {
+		"win": "2.2074",
+		"android": "2.2074",
+		"mac": "2.2074",
+		"ios": "2.2074"
+	},
+	"id": "anekobtw.clicked",
+	"name": "clicked",
+	"version": "v1.0.0",
+	"developer": "anekobtw",
+	"description": "",
+	"dependencies": {
+		"dankmeme.globed2": {
+			"importance": "required",
+			"version": ">=1.8.5"
+		},
+		"geode.custom-keybinds": {
+			"importance": "required",
+			"version": ">=1.10.4"
+		}
+	},
+	"settings": {
+		"server-url": {
+			"type": "string",
+			"name": "Server URL",
+			"default": "http://185.185.71.93:2000"
+		}
+	},
+	"resources": {
+		"files": [
+			"resources/kill.mp3",
+			"resources/on.mp3",
+			"resources/off.mp3"
+		]
+	}
+}
