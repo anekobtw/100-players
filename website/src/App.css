@@ -1,2 +1,59 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+:root {
+    background-color: #09090b;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+}
+
+h1 {
+    font-family: 'Manrope', sans-serif;
+}
+
+.icon-left {
+    position: absolute;
+    top: 45%;
+    left: 0;
+    width: 200px;
+    transform: translateX(-150%) rotate(-20deg);
+    animation: slideInLeft 1.5s ease-out forwards;
+    opacity: 0;
+}
+
+.icon-right {
+    position: absolute;
+    top: 45%;
+    right: 0;
+    width: 200px;
+    transform: translateX(150%) rotate(20deg);
+    animation: slideInRight 1.5s ease-out forwards;
+    opacity: 0;
+}
+
+
+@keyframes slideInRight {
+    0% {
+        transform: translateX(150%) rotate(20deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(55%) rotate(-50deg);
+        opacity: 1;
+    }
+}
+
+@keyframes slideInLeft {
+    0% {
+        transform: translateX(-150%) rotate(-20deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateX(-55%) rotate(50deg);
+        opacity: 1;
+    }
+}
