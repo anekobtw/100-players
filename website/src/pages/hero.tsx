@@ -8,7 +8,8 @@ import { useState, useEffect } from 'react';
 
 function SignInModal() {
     const [username, setUsername] = useState("");
-    const [status, setStatus] = useState<"" | "approved" | "rejected">("rejected");
+    const [status, setStatus] = useState<"" | "approved" | "rejected">("");
+    const [error, setError] = useState("");
 
     async function handleLogin() {
         if (!username) {
@@ -16,11 +17,18 @@ function SignInModal() {
             return
         }
 
+        const data = new FormData();
+        data.append("username", username);
+
         const res = await fetch("http://127.0.0.1:8000/login", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ username: username })
+            body: data
         });
+
+        if (res.status === 404) {
+            const data = await res.json();
+            setError(data.detail);
+        }
 
         setStatus(res.ok ? "approved" : "rejected");
     }
@@ -39,7 +47,7 @@ function SignInModal() {
 
 
                 <fieldset className="fieldset px-20 mb-2 gap-3.5">
-                    {status === "rejected" && <p className='text-error'>Такого аккаунта не существует.</p>}
+                    {status === "rejected" && <p className='text-error'>{error}</p>}
                     {status === "approved" && <p className='text-success'>Вы успешно зарегестрировались на ивент!</p>}
 
                     <label className={`input transition-all ${status === "rejected" ? "input-error" : ""} ${status === "approved" ? "input-success" : ""}`}>
