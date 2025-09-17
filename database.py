@@ -1,27 +1,28 @@
 import sqlite3
+from typing import List, Optional, Tuple
 
-globed_conn = sqlite3.connect("server\\db.sqlite")
-globed_curr = globed_conn.cursor()
+conn = sqlite3.connect("server/db.sqlite")
+cursor = conn.cursor()
 
 
-def whitelist(gd_account_id: int, gd_username: str, is_winner: bool = False) -> None:
-    globed_curr.execute(
+def whitelist(gd_account_id: int, gd_username: str, winner_role: bool = False) -> None:
+    cursor.execute(
         "INSERT OR REPLACE INTO users (account_id, user_name, is_whitelisted, user_roles) VALUES (?, ?, TRUE, ?)",
-        (gd_account_id, gd_username, "winner" if is_winner else None),
+        (gd_account_id, gd_username, "winner" if winner_role else None),
     )
-    globed_conn.commit()
+    conn.commit()
 
 
 def unwhitelist_all() -> None:
-    globed_curr.execute("UPDATE users SET is_whitelisted = FALSE")
-    globed_conn.commit()
+    cursor.execute("UPDATE users SET is_whitelisted = FALSE")
+    conn.commit()
 
 
-def get_username(user_id: int) -> str:
-    globed_curr.execute("SELECT user_name FROM users WHERE account_id = ?", (user_id,))
-    return globed_curr.fetchone()
+def user_exists(username: str) -> Optional[bool]:
+    cursor.execute("SELECT 1 FROM users WHERE user_name = ?", (username,))
+    return cursor.fetchone() is not None
 
 
-def get_all() -> list[tuple]:
-    globed_curr.execute("SELECT account_id, user_name, is_whitelisted, active_room_ban FROM users")
-    return globed_curr.fetchall()
+def get_all() -> List[Tuple]:
+    cursor.execute("SELECT account_id, user_name, is_whitelisted, active_room_ban FROM users")
+    return cursor.fetchall()

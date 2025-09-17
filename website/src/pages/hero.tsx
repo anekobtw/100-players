@@ -72,10 +72,19 @@ function SignInModal() {
 
 function Event({ name, target }: { name: string; target: number }) {
     const [counter, setCounter] = useState(Math.max(0, target - Date.now()));
+    const [isTimerExpired, setIsTimerExpired] = useState(false);
 
     useEffect(() => {
         const timer = setInterval(() => {
-            setCounter(Math.max(0, target - Date.now()));
+            const timeRemaining = target - Date.now();
+            if (timeRemaining <= 0) {
+                clearInterval(timer);
+                setCounter(0);
+                setIsTimerExpired(true);
+            } else {
+                setCounter(timeRemaining);
+                setIsTimerExpired(false);
+            }
         }, 1000);
 
         return () => clearInterval(timer);
@@ -86,18 +95,21 @@ function Event({ name, target }: { name: string; target: number }) {
         const h = Math.floor(totalSeconds / 3600);
         const m = Math.floor((totalSeconds % 3600) / 60);
         const s = totalSeconds % 60;
-        return [h, m, s].map((v) => String(v).padStart(2, "0"));
+        const targetDate = new Date(target);
+
+        return {
+            month: targetDate.toLocaleString('ru-RU', { month: 'short' }),
+            day: targetDate.getDate(),
+            h: String(h).padStart(2, "0"),
+            m: String(m).padStart(2, "0"),
+            s: String(s).padStart(2, "0"),
+        };
     };
 
-
-    const targetDate = new Date(target);
-
-    const month = targetDate.toLocaleString('ru-RU', { month: 'short' });
-    const day = targetDate.getDate();
-    const [h, m, s] = formatTime(counter);
+    const { month, day, h, m, s } = formatTime(counter);
 
     return (
-        <button className='hover:scale-105 transition-all' onClick={() => document.getElementById("signin_modal").showModal()}>
+        <button disabled={!isTimerExpired} className='hover:scale-105 transition-all' onClick={() => document.getElementById("signin_modal").showModal()}>
             <li className="list-row flex justify-between items-center p-5">
                 <div className='justify-items-center p-0.5 border-r border-white mr-3'>
                     <div className='uppercase font-thin text-xl mr-3'>{month}</div>
@@ -135,7 +147,7 @@ function EventsModal() {
                     <h3 className="font-bold text-lg">Ивенты</h3>
 
                     <ul className="list bg-base-100 rounded-box shadow-md">
-                        <Event name='Прятки' target={1758004000 * 1000} />
+                        <Event name='Прятки' target={1758082920 * 1000} />
                     </ul>
                 </div>
             </dialog>

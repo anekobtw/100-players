@@ -47,16 +47,18 @@ async def _(username: str = Form(...)):
         raise HTTPException(404, "Мы уже набрали достаточное количество игроков для съёмок.")
     if username in blacklisted:
         raise HTTPException(404, "Данный аккаунт заблокирован навсегда.")
+    if database.user_exists(username):
+        raise HTTPException(404, "Данный аккаунт уже зарегестрирован.")
 
-    data = fetch_profile(username)
+    data = await fetch_profile(username)
 
-    if not await fetch_profile(username):
+    if not data:
         raise HTTPException(404, "Такого аккаунта не существует.")
 
     database.whitelist(
         gd_account_id=data["accountID"],
         gd_username=data["username"],
-        is_winner=username in winners,
+        winner_role=username in winners,
     )
 
     return True
@@ -65,10 +67,10 @@ async def _(username: str = Form(...)):
 @app.post("/run")
 async def _():
     # I'm just leaving it here for now, it'll be secured later
-    GAME_SERVER_FILE = "../globed-game-server.exe"
-    CENTRAL_SERVER_FILE = "../globed-central-server.exe"
+    GAME_SERVER_FILE = "server/globed-game-server-x64"
+    CENTRAL_SERVER_FILE = "server/globed-central-server.exe"
 
-    with open("../central-conf.json") as f:
+    with open("server/central-conf.json") as f:
         config = json.load(f)
         server_password = config["game_server_password"]
         ip = "http://" + config["game_servers"][0]["address"][:-1] + "1"
