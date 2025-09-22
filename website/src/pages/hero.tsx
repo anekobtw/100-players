@@ -2,20 +2,31 @@ import '../App.css';
 import "tailwindcss";
 import dimaNelisIcon from '../assets/cube_102.png';
 import limeIcon from '../assets/cube_107.png';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
+
+function CloseButton() {
+    return (
+        <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        </form>
+    )
+}
 
 
 function SignInModal() {
     const [username, setUsername] = useState("");
-    const [status, setStatus] = useState<"" | "approved" | "rejected">("");
+    const [status, setStatus] = useState<"" | "loading" | "approved" | "rejected">("");
     const [error, setError] = useState("");
 
     async function handleLogin() {
         if (!username) {
             setStatus("rejected");
+            setError("Пожалуйста, впишите свой никнейм из игры.")
             return
         }
+
+        setStatus("loading");
 
         const data = new FormData();
         data.append("username", username);
@@ -25,22 +36,21 @@ function SignInModal() {
             body: data
         });
 
-        if (res.status === 404) {
-            const data = await res.json();
-            setError(data.detail);
+        if (!res.ok) {
+            setStatus("rejected");
+            setError(data.detail || "Ошибка авторизации");
+        } else {
+            setStatus("approved");
         }
 
-        setStatus(res.ok ? "approved" : "rejected");
     }
 
 
     return (
         <dialog id="signin_modal" className="modal">
             <div className="modal-box">
+                <CloseButton />
 
-                <form method="dialog">
-                    <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                </form>
 
                 <h3 className="mb-3 font-bold text-lg">Зарегестрироваться</h3>
                 <p className="pb-3 mb-5 text-gray-300 text-center">Пожалуйста, впишите свои данные от аккаунта в Geometry Dash, чтобы зарегестрироваться.</p>
@@ -50,7 +60,7 @@ function SignInModal() {
                     {status === "rejected" && <p className='text-error'>{error}</p>}
                     {status === "approved" && <p className='text-success'>Вы успешно зарегестрировались на ивент!</p>}
 
-                    <label className={`input transition-all ${status === "rejected" ? "input-error" : ""} ${status === "approved" ? "input-success" : ""}`}>
+                    <label className={`input transition-all ${status === "rejected" ? "input-error" : status === "approved" ? "input-success" : ""}`}>
                         <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor">
                                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
@@ -62,7 +72,9 @@ function SignInModal() {
                     </label>
                 </fieldset>
 
-                <button type='button' className="btn btn-neutral rounded- mt-4 hover:scale-110 transition-all" onClick={() => handleLogin()}>Зарегестрироваться</button>
+                {status === "loading" ? (
+                    <button type="button" disabled={true} className='btn rounded mt-4'>Регистрируем...</button>
+                ) : <button type='button' className="btn btn-neutral rounded mt-4 hover:scale-110 transition-all" onClick={() => handleLogin()}>Зарегестрироваться</button>}
             </div>
         </dialog>
     )
@@ -70,32 +82,28 @@ function SignInModal() {
 
 
 
-function Event({ name, target }: { name: string; target: number }) {
-    const [counter, setCounter] = useState(Math.max(0, target - Date.now()));
-    const [isTimerExpired, setIsTimerExpired] = useState(false);
+function Event({ name, timestamp }: { name: string; timestamp: number }) {
+    const targetDate = useMemo(() => new Date(timestamp), [timestamp]);
+    const [counter, setCounter] = useState(Math.max(0, timestamp - Date.now()));
+    const isTimerExpired = counter <= 0;
 
     useEffect(() => {
-        const timer = setInterval(() => {
-            const timeRemaining = target - Date.now();
-            if (timeRemaining <= 0) {
-                clearInterval(timer);
-                setCounter(0);
-                setIsTimerExpired(true);
-            } else {
-                setCounter(timeRemaining);
-                setIsTimerExpired(false);
-            }
-        }, 1000);
+        const tick = () => {
+            const diff = timestamp - Date.now();
+            setCounter(Math.max(0, diff));
+        };
+
+        const timer = setInterval(tick, 1000);
+        tick();
 
         return () => clearInterval(timer);
-    }, [target]);
+    }, [timestamp]);
 
-    const formatTime = (ms: number) => {
-        const totalSeconds = Math.floor(ms / 1000);
+    const { month, day, h, m, s } = useMemo(() => {
+        const totalSeconds = Math.floor(counter / 1000);
         const h = Math.floor(totalSeconds / 3600);
         const m = Math.floor((totalSeconds % 3600) / 60);
         const s = totalSeconds % 60;
-        const targetDate = new Date(target);
 
         return {
             month: targetDate.toLocaleString('ru-RU', { month: 'short' }),
@@ -104,31 +112,33 @@ function Event({ name, target }: { name: string; target: number }) {
             m: String(m).padStart(2, "0"),
             s: String(s).padStart(2, "0"),
         };
-    };
+    }, [counter, targetDate]);
 
-    const { month, day, h, m, s } = formatTime(counter);
 
     return (
         <button disabled={!isTimerExpired} className='hover:scale-105 transition-all' onClick={() => document.getElementById("signin_modal").showModal()}>
-            <li className="list-row flex justify-between items-center p-5">
+            <div className="flex p-5">
                 <div className='justify-items-center p-0.5 border-r border-white mr-3'>
                     <div className='uppercase font-thin text-xl mr-3'>{month}</div>
                     <div className='uppercase font-thin text-4xl mr-3'>{day}</div>
                 </div>
 
                 <div className='flex-grow flex flex-col items-center'>
-                    <div className='text-4xl font-medium'>{name}</div>
-                    <span className="countdown font-mono text-2xl text-gray-400">
-                        <span style={{ "--value": h } as React.CSSProperties} aria-live="polite" aria-label={String(h)}>{h}</span>
-                        :
-                        <span style={{ "--value": m } as React.CSSProperties} aria-live="polite" aria-label={String(m)}>{m}</span>
-                        :
-                        <span style={{ "--value": s } as React.CSSProperties} aria-live="polite" aria-label={String(s)}>{s}</span>
-                    </span>
+                    <div className='text-4xl font-medium mb-2.5'>{name}</div>
+                    {isTimerExpired ? (
+                        <span className="text-gray-400">Регистрация открыта!</span>
+                    ) : (
+                        <>
+                            <span className="text-gray-400">Регистрация откроется через:</span>
+                            <span className="countdown font-mono text-2xl text-gray-400">
+                                <span style={{ "--value": h } as React.CSSProperties}>{h}</span>:
+                                <span style={{ "--value": m } as React.CSSProperties}>{m}</span>:
+                                <span style={{ "--value": s } as React.CSSProperties}>{s}</span>
+                            </span>
+                        </>
+                    )}
                 </div>
-            </li>
-
-            <SignInModal />
+            </div>
         </button>
     );
 }
@@ -141,17 +151,16 @@ function EventsModal() {
             <button className="btn btn-soft hover:scale-120 transition-all" onClick={() => document.getElementById("events_modal").showModal()}>Ивенты</button>
             <dialog id="events_modal" className="modal">
                 <div className="modal-box">
-                    <form method="dialog">
-                        <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
-                    </form>
+                    <CloseButton />
+
                     <h3 className="font-bold text-lg">Ивенты</h3>
 
                     <ul className="list bg-base-100 rounded-box shadow-md">
-                        <Event name='Прятки' target={1758082920 * 1000} />
+                        <Event name='Прятки' timestamp={1758512492 * 1000} />
                     </ul>
                 </div>
             </dialog>
-        </span >
+        </span>
     )
 }
 
@@ -175,6 +184,7 @@ export default function Hero() {
                     </a>
 
                     <EventsModal />
+                    <SignInModal />
                 </div>
             </div>
         </div>
