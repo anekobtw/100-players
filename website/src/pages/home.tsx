@@ -156,7 +156,7 @@ function EventsModal() {
                     <h3 className="font-bold text-lg">Ивенты</h3>
 
                     <ul className="list bg-base-100 rounded-box shadow-md">
-                        <Event name='Прятки' timestamp={1758512492 * 1000} />
+                        <Event name='Прятки' timestamp={1758513896 * 1000} />
                     </ul>
                 </div>
             </dialog>
@@ -166,7 +166,7 @@ function EventsModal() {
 
 
 
-export default function Hero() {
+export default function Home() {
     return (
         <div className="hero min-h-screen">
             <img src={dimaNelisIcon} className='icon-left'></img>
