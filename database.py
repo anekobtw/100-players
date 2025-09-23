@@ -23,6 +23,15 @@ def user_exists(username: str) -> Optional[bool]:
     return cursor.fetchone() is not None
 
 
-def get_all() -> List[Tuple]:
+def get_all() -> list[dict]:
     cursor.execute("SELECT account_id, user_name, is_whitelisted, active_room_ban FROM users")
-    return cursor.fetchall()
+    rows = cursor.fetchall()
+    return [
+        {
+            "account_id": r[0],
+            "username": r[1],
+            "is_whitelisted": r[2],
+            "active_room_ban": r[3],
+        }
+        for r in rows
+    ]

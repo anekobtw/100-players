@@ -30,6 +30,7 @@ async def fetch_profile(nickname: str) -> dict | None:
 
 
 LIMIT = 150
+IS_GLOBED_WORKING = False
 blacklisted = {"snownitt"}
 winners = {
     "anekobtw",
@@ -44,16 +45,16 @@ winners = {
 @app.post("/login")
 async def _(username: str = Form(...)):
     if len(database.get_all()) >= LIMIT:
-        raise HTTPException(404, "Мы уже набрали достаточное количество игроков для съёмок.")
+        raise HTTPException(404, detail="Мы уже набрали достаточное количество игроков для съёмок.")
     if username in blacklisted:
-        raise HTTPException(404, "Данный аккаунт заблокирован навсегда.")
+        raise HTTPException(404, detail="Данный аккаунт заблокирован навсегда.")
     if database.user_exists(username):
-        raise HTTPException(404, "Данный аккаунт уже зарегестрирован.")
+        raise HTTPException(404, detail="Данный аккаунт уже зарегестрирован.")
 
     data = await fetch_profile(username)
 
     if not data:
-        raise HTTPException(404, "Такого аккаунта не существует.")
+        raise HTTPException(404, detail="Такого аккаунта не существует.")
 
     database.whitelist(
         gd_account_id=data["accountID"],
@@ -64,8 +65,29 @@ async def _(username: str = Form(...)):
     return True
 
 
+@app.get("/info")
+async def _():
+    return {
+        "isGlobedWorking": IS_GLOBED_WORKING,
+        "globedURL": "a",
+        "apiURL": "b",
+        "currentUsers": len(database.get_all()),
+        "Limit": LIMIT,
+    }
+
+
+@app.get("/database")
+async def _():
+    users = database.get_all()
+    if not users:
+        raise HTTPException(404, "No users found")
+    return users
+
+
 @app.post("/run")
 async def _():
+    global IS_GLOBED_WORKING
+
     # I'm just leaving it here for now, it'll be secured later
     GAME_SERVER_FILE = "server/globed-game-server-x64"
     CENTRAL_SERVER_FILE = "server/globed-central-server.exe"
@@ -78,6 +100,8 @@ async def _():
     await asyncio.create_subprocess_exec(CENTRAL_SERVER_FILE, cwd="../")
     await asyncio.sleep(3)
     await asyncio.create_subprocess_exec(GAME_SERVER_FILE, "0.0.0.0:4202", ip, server_password, cwd="../")
+
+    IS_GLOBED_WORKING = True
 
 
 if __name__ == "__main__":

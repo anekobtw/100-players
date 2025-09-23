@@ -1,7 +1,10 @@
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import '../App.css';
 import "tailwindcss";
 
 
+
+// This will probably be deleted
 function LimitModal() {
     return (
         <dialog id="limit_modal" className="modal">
@@ -9,8 +12,6 @@ function LimitModal() {
                 <form method="dialog">
                     <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
                 </form>
-
-
 
                 <h3 className="font-bold text-lg text-center">Установить новый лимит</h3>
                 <fieldset className="fieldset px-20 mb-2 gap-3.5">
@@ -30,19 +31,117 @@ function LimitModal() {
 
 
 export default function Admin() {
+    const [currentUsers, setCurrentUsers] = useState(0);
+    const [isApiWorking, setIsApiWorking] = useState(true);
+    const [isGlobedWorking, setIsGlobedWorking] = useState(false);
+    const [globedURL, setGlobedURL] = useState("");
+    const [apiURL, setApiURL] = useState("");
+    const [isCopied, setIsCopied] = useState(false);
+    const [database, setDatabase] = useState(null);
+
+
+    useEffect(() => {
+        const interval = setInterval(async () => {
+            try {
+                const res = await fetch("http://127.0.0.1:8000/info");
+                const data = await res.json();
+                setIsApiWorking(true)
+                setCurrentUsers(data["currentUsers"])
+                setIsGlobedWorking(data["isGlobedWorking"]);
+                setGlobedURL(data["globedURL"]);
+                setApiURL(data["apiURL"]);
+            } catch (err) {
+                setIsGlobedWorking(false);
+                setIsApiWorking(false);
+            }
+
+            try {
+                const res = await fetch("http://127.0.0.1:8000/database");
+                const data = await res.json();
+                setDatabase(data.length ? data : null);
+            } catch (err) {
+                setDatabase(null);
+            }
+        }, 1000);
+
+        return () => clearInterval(interval);
+    }, []);
+
+
+    const copyToClipboard = async (text: string) => {
+        try {
+            await navigator.clipboard.writeText(text);
+            setIsCopied(true);
+            setTimeout(() => setIsCopied(false), 2000);
+        } catch (err) {
+            console.error("Ошибка копирования: ", err);
+        }
+    };
+
+
+    function copyableText(text: string) {
+        return (
+            <span className='hover:bg-neutral-900 px-2 py-0.5 cursor-pointer rounded-3xl transition-all' onClick={() => copyToClipboard(text)}>{text}</span>
+        )
+    }
 
 
     return (
-        <span>
-            <div className="stat">
-                <div className="stat-title">Пользователей</div>
-                <div className="stat-value">80/150</div>
-                <div className="stat-actions">
-                    <button className="btn btn-xs btn-info" onClick={() => document.getElementById('limit_modal').showModal()}>Изменить лимит</button >
+        <div className='flex items-start'>
+
+            {/* Copy toast */}
+            {isCopied && (
+                <div className="toast">
+                    <div className="alert alert-info">
+                        <span>Скопировано!</span>
+                    </div>
                 </div>
+            )}
+
+
+            {/* Info */}
+            <div className='text-xl m-5 bg-base-100 rounded-3xl p-4'>
+                <div className='inline-grid align-middle *:[grid-area:1/1]'>
+                    <div className={`status status-${isGlobedWorking ? "success" : "error"} animate-ping`}></div>
+                    <div className={`status status-${isGlobedWorking ? "success" : "error"}`}></div>
+                </div> GLOBED URL: {copyableText(globedURL)}
+
+                <br />
+
+                <div className='inline-grid align-middle *:[grid-area:1/1]'>
+                    <div className={`status status-${isApiWorking ? "success" : "error"} animate-ping`}></div>
+                    <div className={`status status-${isApiWorking ? "success" : "error"}`}></div>
+                </div> API URL: {copyableText(apiURL)}
             </div>
 
-            <LimitModal />
-        </span>
+
+            {/* Database */}
+            <div className="overflow-auto rounded-box border border-base-content/5 bg-base-100 p-1 m-5">
+                {database ? (
+                    <table className="table">
+                        <thead>
+                            <tr>
+                                <th>Аккаунт айди</th>
+                                <th>Никнейм</th>
+                                <th>Вайтлист</th>
+                                <th>Забанен</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {database.map((item) => (
+                                <tr key={item.account_id}>
+                                    <th>{item.account_id}</th>
+                                    <td>{item.username}</td>
+                                    <td>{item.is_whitelisted ? "Да" : "Нет"}</td>
+                                    <td>{item.active_room_ban ? "Да" : "Нет"}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                ) : (
+                    <div className="p-4 text-center text-gray-500">Данных нет :(</div>
+                )}
+            </div>
+        </div>
     )
 }

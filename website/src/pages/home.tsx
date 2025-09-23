@@ -5,6 +5,7 @@ import limeIcon from '../assets/cube_107.png';
 import { useState, useEffect, useMemo } from 'react';
 
 
+
 function CloseButton() {
     return (
         <form method="dialog">
@@ -14,13 +15,15 @@ function CloseButton() {
 }
 
 
+
 function SignInModal() {
     const [username, setUsername] = useState("");
     const [status, setStatus] = useState<"" | "loading" | "approved" | "rejected">("");
     const [error, setError] = useState("");
 
+
     async function handleLogin() {
-        if (!username) {
+        if (!username?.trim()) {
             setStatus("rejected");
             setError("Пожалуйста, впишите свой никнейм из игры.")
             return
@@ -28,17 +31,15 @@ function SignInModal() {
 
         setStatus("loading");
 
-        const data = new FormData();
-        data.append("username", username);
-
         const res = await fetch("http://127.0.0.1:8000/login", {
             method: "POST",
-            body: data
+            body: new URLSearchParams({ username }),
         });
 
         if (!res.ok) {
             setStatus("rejected");
-            setError(data.detail || "Ошибка авторизации");
+            const err = await res.json();
+            setError(err.detail);
         } else {
             setStatus("approved");
         }
@@ -51,15 +52,24 @@ function SignInModal() {
             <div className="modal-box">
                 <CloseButton />
 
-
+                {/* Title and description */}
                 <h3 className="mb-3 font-bold text-lg">Зарегестрироваться</h3>
                 <p className="pb-3 mb-5 text-gray-300 text-center">Пожалуйста, впишите свои данные от аккаунта в Geometry Dash, чтобы зарегестрироваться.</p>
 
-
                 <fieldset className="fieldset px-20 mb-2 gap-3.5">
-                    {status === "rejected" && <p className='text-error'>{error}</p>}
-                    {status === "approved" && <p className='text-success'>Вы успешно зарегестрировались на ивент!</p>}
+                    {/* Beautiful alerts */}
+                    {status === "rejected" && (
+                        <div role="alert" className="alert alert-error alert-soft">
+                            <span>{error}</span>
+                        </div>
+                    )}
+                    {status === "approved" && (
+                        <div role="alert" className="alert alert-success alert-soft">
+                            <span>Вы успешно зарегестрировались на ивент!</span>
+                        </div>
+                    )}
 
+                    {/* Username input */}
                     <label className={`input transition-all ${status === "rejected" ? "input-error" : status === "approved" ? "input-success" : ""}`}>
                         <svg className="h-[1em] opacity-50" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                             <g strokeLinejoin="round" strokeLinecap="round" strokeWidth="2.5" fill="none" stroke="currentColor">
@@ -72,8 +82,9 @@ function SignInModal() {
                     </label>
                 </fieldset>
 
+                {/* Register/Loading button */}
                 {status === "loading" ? (
-                    <button type="button" disabled={true} className='btn rounded mt-4'>Регистрируем...</button>
+                    <button type="button" disabled className='btn rounded mt-4'>Регистрируем...</button>
                 ) : <button type='button' className="btn btn-neutral rounded mt-4 hover:scale-110 transition-all" onClick={() => handleLogin()}>Зарегестрироваться</button>}
             </div>
         </dialog>
@@ -87,6 +98,7 @@ function Event({ name, timestamp }: { name: string; timestamp: number }) {
     const [counter, setCounter] = useState(Math.max(0, timestamp - Date.now()));
     const isTimerExpired = counter <= 0;
 
+    { /* I know that this is unreadable sorry, it calculates the time until event */ }
     useEffect(() => {
         const tick = () => {
             const diff = timestamp - Date.now();
@@ -118,13 +130,23 @@ function Event({ name, timestamp }: { name: string; timestamp: number }) {
     return (
         <button disabled={!isTimerExpired} className='hover:scale-105 transition-all' onClick={() => document.getElementById("signin_modal").showModal()}>
             <div className="flex p-5">
+
+                {/* Date */}
                 <div className='justify-items-center p-0.5 border-r border-white mr-3'>
                     <div className='uppercase font-thin text-xl mr-3'>{month}</div>
                     <div className='uppercase font-thin text-4xl mr-3'>{day}</div>
                 </div>
 
                 <div className='flex-grow flex flex-col items-center'>
-                    <div className='text-4xl font-medium mb-2.5'>{name}</div>
+                    {/* Animated ping and name */}
+                    <div className='text-4xl font-medium mb-2.5'>
+                        <div className="inline-grid align-middle *:[grid-area:1/1]">
+                            <div className={`status status-${isTimerExpired ? "success" : "error"} animate-ping`}></div>
+                            <div className={`status status-${isTimerExpired ? "success" : "error"}`}></div>
+                        </div> {name}
+                    </div>
+
+                    {/* Countdown */}
                     {isTimerExpired ? (
                         <span className="text-gray-400">Регистрация открыта!</span>
                     ) : (
@@ -156,7 +178,8 @@ function EventsModal() {
                     <h3 className="font-bold text-lg">Ивенты</h3>
 
                     <ul className="list bg-base-100 rounded-box shadow-md">
-                        <Event name='Прятки' timestamp={1758513896 * 1000} />
+                        {/* All the events should be provided here */}
+                        <Event name='Прятки' timestamp={1758602320 * 1000} />
                     </ul>
                 </div>
             </dialog>
@@ -169,9 +192,13 @@ function EventsModal() {
 export default function Home() {
     return (
         <div className="hero min-h-screen">
+
+            {/* Icons */}
             <img src={dimaNelisIcon} className='icon-left'></img>
             <img src={limeIcon} className='icon-right'></img>
 
+
+            {/* Text and buttons */}
             <div className="hero-content text-center">
                 <div>
                     <h1 className="mb-15 text-5xl md:text-8xl font-extrabold drop-shadow-[0_0_40px_#83BCFF] hover:scale-105 transition-all">100 игроков</h1>
