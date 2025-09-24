@@ -179,7 +179,7 @@ function EventsModal() {
 
                     <ul className="list bg-base-100 rounded-box shadow-md">
                         {/* All the events should be provided here */}
-                        <Event name='Прятки' timestamp={1758602320 * 1000} />
+                        <Event name='Прятки' timestamp={1758698532 * 1000} />
                     </ul>
                 </div>
             </dialog>
