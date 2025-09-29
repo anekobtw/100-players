@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@theme {
+  --animate-infinite-scroll: infinite-scroll 60s ease-in ease-out infinite;
+
+  @keyframes infinite-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+}
+

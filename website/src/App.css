@@ -17,6 +17,13 @@ h1 {
     font-family: 'Manrope', sans-serif;
 }
 
+
+@media (max-width: 768px) {
+  img {
+    display: none;
+  }
+}
+
 .icon-left {
     position: absolute;
     top: 45%;
