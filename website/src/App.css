@@ -6,9 +6,11 @@
     background-color: #09090b;
 }
 
+
 body {
     font-family: 'Inter', sans-serif;
     overflow-x: hidden;
+    animation: fadeIn 1s;
 }
 
 h1 {
@@ -22,7 +24,6 @@ h1 {
     width: 200px;
     transform: translateX(-150%) rotate(-20deg);
     animation: slideInLeft 1.5s ease-out forwards;
-    opacity: 0;
 }
 
 .icon-right {
@@ -32,30 +33,30 @@ h1 {
     width: 200px;
     transform: translateX(150%) rotate(20deg);
     animation: slideInRight 1.5s ease-out forwards;
-    opacity: 0;
 }
 
 
 @keyframes slideInRight {
     0% {
         transform: translateX(150%) rotate(20deg);
-        opacity: 0;
     }
 
     100% {
         transform: translateX(45%) rotate(-50deg);
-        opacity: 1;
     }
 }
 
 @keyframes slideInLeft {
     0% {
         transform: translateX(-150%) rotate(-20deg);
-        opacity: 0;
     }
 
     100% {
         transform: translateX(-45%) rotate(50deg);
-        opacity: 1;
     }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
