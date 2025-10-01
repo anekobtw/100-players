@@ -27,7 +27,7 @@ function EventCard({ event }: { event: { id: number; name: string; name_eng: str
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex gap-1">
           Хост: {event.host}
 
-          {(event.host == "7Lime" || event.host == "DimaNelis") && (
+          {(event.host === "7Lime" || event.host === "DimaNelis" || event.host === "anekobtw") && (
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="1.1em" height="1.1em" fill="none" stroke="#007bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M12 3a3.6 3.6 0 00-3.05 1.68 3.6 3.6 0 00-.9-.1 3.6 3.6 0 00-2.42 1.06 3.6 3.6 0 00-.94 3.32A3.6 3.6 0 003 12a3.6 3.6 0 001.69 3.05 3.6 3.6 0 00.95 3.32 3.6 3.6 0 003.35.96A3.6 3.6 0 0012 21a3.6 3.6 0 003.04-1.67 3.6 3.6 0 004.3-4.3A3.6 3.6 0 0021 12a3.6 3.6 0 00-1.67-3.04v0a3.6 3.6 0 00-4.3-4.3A3.6 3.6 0 0012 3z"></path> <path d="M15 10l-4 4"></path> <path d="M9 12l2 2"></path> </g></svg>
           )}
         </p>
@@ -49,8 +49,8 @@ function EventCard({ event }: { event: { id: number; name: string; name_eng: str
       <button
         disabled={timeLeft !== 0}
         className={`mt-auto font-semibold py-2 px-4 rounded-lg transition ${timeLeft === 0
-            ? "bg-blue-600 text-white hover:bg-blue-700"
-            : "bg-gray-400 text-gray-800 cursor-not-allowed"
+          ? "bg-blue-600 text-white hover:bg-blue-700"
+          : "bg-gray-400 text-gray-800 cursor-not-allowed"
           }`}
       >
         {timeLeft === 0
