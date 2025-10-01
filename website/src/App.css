@@ -13,8 +13,24 @@ body {
     animation: fadeIn 1s;
 }
 
+
 h1 {
     font-family: 'Manrope', sans-serif;
+}
+
+
+button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+button svg {
+  display: block;
+  vertical-align: middle;
+  margin-top: -2px;
+  width: 1em;
+  height: 1em;
 }
 
 
@@ -23,6 +39,7 @@ h1 {
     display: none;
   }
 }
+
 
 .icon-left {
     position: absolute;
@@ -67,3 +84,144 @@ h1 {
   from { opacity: 0; }
   to { opacity: 1; }
 }
+
+
+/* Telegram-style button */
+.telegram-button {
+  position: relative;
+  border-radius: 7px;
+  border: 1px solid #00bfff;
+  background: transparent;
+  overflow: hidden;
+  box-shadow: 0 0 0 0 transparent;
+  transition: all 0.2s ease-in;
+}
+
+.telegram-button:hover {
+  background: #00bfff;
+  box-shadow: 0 0 30px 5px rgba(0, 191, 255, 0.815);
+  transition: all 0.2s ease-out;
+}
+
+.telegram-button::before {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 86%;
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  opacity: 0;
+  background: #fff;
+  box-shadow: 0 0 50px 30px #fff;
+  transform: skewX(-20deg);
+}
+
+.telegram-button:hover::before {
+  animation: sh02 0.5s 0s linear;
+}
+
+.telegram-button:active {
+  box-shadow: 0 0 0 0 transparent;
+  transition: box-shadow 0.2s ease-in;
+}
+
+
+/* YouTube-style button */
+.youtube-button {
+  position: relative;
+  border-radius: 7px;
+  border: 1px solid #ff3b3b;
+  background: transparent;
+  overflow: hidden;
+  box-shadow: 0 0 0 0 transparent;
+  transition: all 0.2s ease-in;
+}
+
+.youtube-button:hover {
+  background: #ff3b3b;
+  box-shadow: 0 0 30px 5px rgba(255, 59, 59, 0.815);
+  transition: all 0.2s ease-out;
+}
+
+.youtube-button::before {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 86%;
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  opacity: 0;
+  background: #fff;
+  box-shadow: 0 0 50px 30px #fff;
+  transform: skewX(-20deg);
+}
+
+.youtube-button:hover::before {
+  animation: sh02 0.5s 0s linear;
+}
+
+.youtube-button:active {
+  box-shadow: 0 0 0 0 transparent;
+  transition: box-shadow 0.2s ease-in;
+}
+
+
+/* Events button */
+.events-button {
+  position: relative;
+  padding: 10px 20px;
+  border-radius: 7px;
+  border: 1px solid #4d4d4d;
+  background: transparent;
+  overflow: hidden;
+  box-shadow: 0 0 0 0 transparent;
+  transition: all 0.2s ease-in;
+}
+
+.events-button:hover {
+  background: #4d4d4d;
+  box-shadow: 0 0 20px 3px rgba(179, 179, 179, 0.815);
+  transition: all 0.2s ease-out;
+}
+
+.events-button::before {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 86%;
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  opacity: 0;
+  background: #fff; /* shine effect */
+  box-shadow: 0 0 50px 30px #fff;
+  transform: skewX(-20deg);
+}
+
+.events-button:hover::before {
+  animation: sh02 0.5s 0s linear;
+}
+
+.events-button:active {
+  box-shadow: 0 0 0 0 transparent;
+  transition: box-shadow 0.2s ease-in;
+}
+
+
+/* Shared keyframes for shine effect */
+@keyframes sh02 {
+  from {
+    opacity: 0;
+    left: 0%;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    left: 100%;
+  }
+}
+
