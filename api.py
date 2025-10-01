@@ -30,7 +30,7 @@ async def fetch_profile(nickname: str) -> dict | None:
 
 
 LIMIT = 150
-IS_GLOBED_WORKING = False
+IS_CENTRAL_WORKING = False
 blacklisted = {"snownitt"}
 winners = {
     "anekobtw",
@@ -45,9 +45,11 @@ winners = {
 @app.post("/login")
 async def _(username: str = Form(...)):
     if len(database.get_all()) >= LIMIT:
-        raise HTTPException(404, detail="Мы уже набрали достаточное количество игроков для съёмок.")
+        raise HTTPException(
+            404, detail="Мы уже набрали достаточное количество игроков для съёмок.")
     if username in blacklisted:
-        raise HTTPException(404, detail="Данный аккаунт заблокирован навсегда.")
+        raise HTTPException(
+            404, detail="Данный аккаунт заблокирован навсегда.")
     if database.user_exists(username):
         raise HTTPException(404, detail="Данный аккаунт уже зарегестрирован.")
 
@@ -65,14 +67,18 @@ async def _(username: str = Form(...)):
     return True
 
 
+@app.get("/events")
+async def _():
+    print(database.list_servers())
+    return database.list_servers()
+
+
 @app.get("/info")
 async def _():
     return {
-        "isGlobedWorking": IS_GLOBED_WORKING,
-        "globedURL": "a",
+        "isCentralWorking": IS_CENTRAL_WORKING,
+        "centralURL": "a",
         "apiURL": "b",
-        "currentUsers": len(database.get_all()),
-        "Limit": LIMIT,
     }
 
 

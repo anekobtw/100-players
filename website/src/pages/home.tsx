@@ -81,11 +81,11 @@ export default function Home() {
         </div>
 
         <div className='flex gap-15'>
-          <button className='btn events-button hover:scale-105 transition-all'>
+          <button className='btn events-button hover:scale-105 transition-all' onClick={() => document.getElementById('events_modal').showModal()}>
             Ивенты
           </button>
 
-          <button className='btn events-button hover:scale-105 transition-all'>
+          <button className='btn events-button hover:scale-105 transition-all' onClick={() => document.getElementById('request_event_modal').showModal()}>
             Захостить ивент
           </button>
         </div>
