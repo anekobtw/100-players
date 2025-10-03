@@ -2,10 +2,16 @@
     "web_mountpoint": "/",
     "game_servers": [
         {
-            "id": "main",
-            "name": "Example",
-            "address": "127.0.0.1:4204",
-            "region": "USA"
+            "id": "server-1",
+            "name": "PRYATKI",
+            "address": "localhost:4203",
+            "region": ""
+        },
+        {
+            "id": "server-2",
+            "name": "Box",
+            "address": "localhost:4203",
+            "region": ""
         }
     ],
     "relays": [],

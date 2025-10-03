@@ -1,7 +1,5 @@
-import asyncio
 import aiohttp
 
-import uvicorn
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -12,7 +10,7 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:4202"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -75,9 +73,3 @@ async def _():
     if not users:
         raise HTTPException(404, "No users found")
     return users
-
-
-if __name__ == "__main__":
-    config = uvicorn.Config(app, host="0.0.0.0", port=8000, log_level="debug")
-    server = uvicorn.Server(config)
-    asyncio.run(server.serve())
