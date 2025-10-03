@@ -3,9 +3,9 @@
     "game_servers": [
         {
             "id": "main",
-            "name": "BOX",
-            "address": "127.0.0.1:4202",
-            "region": "Russia"
+            "name": "Example",
+            "address": "127.0.0.1:4204",
+            "region": "USA"
         }
     ],
     "relays": [],
@@ -100,7 +100,7 @@
     "refresh_interval": 3000,
     "secret_key": "Insecure-FUe06rj7ITmVjVZy4j7Sa8hL6Qv8MYaP",
     "secret_key2": "Insecure-by35lCpAeOm4G3UCbVdWjwzKGceiJ1lq",
-    "game_server_password": "Insecure-hnaM10KEvsL0uSwKXj70YlhEXnxBVghT",
+    "game_server_password": "4m9sQk8vR1tYz2pL0uVwX3nC6bH7qJ5eF2gZ0yU1aV",
     "cloudflare_protection": false,
     "challenge_expiry": 30,
     "token_expiry": 86400
