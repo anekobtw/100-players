@@ -1,7 +1,6 @@
 import asyncio
 import json
 
-import aiohttp
 import uvicorn
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,13 +19,13 @@ app.add_middleware(
 )
 
 
-async def fetch_profile(nickname: str) -> dict | None:
-    url = f"https://gdbrowser.com/api/profile/{nickname}"
-    async with aiohttp.ClientSession() as session:
-        async with session.get(url) as resp:
-            if resp.status != 200:
-                return None
-            return await resp.json()
+# async def fetch_profile(nickname: str) -> dict | None:
+#   url = f"https://gdbrowser.com/api/profile/{nickname}"
+#  async with aiohttp.ClientSession() as session:
+#     async with session.get(url) as resp:
+#        if resp.status != 200:
+#           return None
+#      return await resp.json()
 
 
 LIMIT = 150

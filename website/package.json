@@ -16,6 +16,7 @@
     "@tailwindplus/elements": "^1.0.12",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^7.9.1"
   },
   "devDependencies": {
