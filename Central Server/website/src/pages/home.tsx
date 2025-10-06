@@ -1,16 +1,18 @@
 import '../App.css';
 import "tailwindcss";
 import EventsModal from './events';
-import dimaNelisIcon from '../assets/cube_102.png';
-import limeIcon from '../assets/cube_107.png';
 import { useEffect, useRef } from 'react';
 
+import dimaNelisIcon from '../assets/cube_102.png';
+import limeIcon from '../assets/cube_107.png';
 
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+
+    {/* Smooth scrolling */ }
     const container = containerRef.current;
     if (!container) return;
 
@@ -36,18 +38,25 @@ export default function Home() {
     return () => window.removeEventListener("wheel", onWheel);
   }, []);
 
-
-
   return (
-    <div ref={containerRef} className="h-screen overflow-hidden">
+    <div ref={containerRef} className="h-screen overflow-hidden light:abg-white">
 
       {/* Main Page */}
-      <section className="hero relative h-screen w-screen bg-linear-to-b from-blue-600/15 via-transparent flex flex-col">
+      <section className="hero relative h-screen w-screen bg-linear-to-b from-blue-600/35 via-transparent flex flex-col">
         {/* Icons */}
         <img src={dimaNelisIcon} className="icon-left" />
         <img src={limeIcon} className="icon-right" />
 
-        <h1 className="mt-75 mb-25 text-5xl md:text-8xl font-extrabold drop-shadow-[0_0_40px_#83BCFF] hover:scale-105 transition-all">100 игроков</h1>
+        <h1
+          className="
+            mt-75 mb-25 text-5xl md:text-8xl font-extrabold
+            text-slate-800 dark:text-blue-100
+            drop-shadow-[0_0_40px_#8D8D8F] dark:drop-shadow-[0_0_40px_#1E90FF]
+            hover:scale-105 transition-all
+          "
+        >
+          100 игроков
+        </h1>
 
         <div className="flex gap-20 mb-8">
           <a href="https://www.youtube.com/@Нелис" target="_blank" rel="noopener noreferrer">
