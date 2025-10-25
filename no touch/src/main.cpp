@@ -14,7 +14,7 @@ CCNode* getPlayerLayer(int accountID) {
     auto layer = PlayLayer::get();
     if (!layer) return nullptr;
 
-    auto mainNode = layer->getChildByID("main-node");    
+    auto mainNode = layer->getChildByID("main-node");
     if (!mainNode) return nullptr;
 
     auto batchLayer = mainNode->getChildByID("batch-layer");
@@ -30,9 +30,9 @@ CCNode* getPlayerLayer(int accountID) {
 class $modify(CustomPlayLayer, PlayLayer) {
     bool init(GJGameLevel* level, bool useReplay, bool dontCreateObjects) {
         if (!PlayLayer::init(level, useReplay, dontCreateObjects)) return false;
-        
+
         this->schedule(schedule_selector(CustomPlayLayer::checkForHiding), 0.1f);
-        
+
         return true;
     }
 

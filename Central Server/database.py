@@ -7,7 +7,7 @@ globed_curr = globed_conn.cursor()
 def whitelist(gd_account_id: int, gd_username: str, is_winner: bool = False) -> None:
     globed_curr.execute(
         "INSERT INTO punishments (account_id, type, reason, expires_at, type2) VALUES (?, ?, ?, ?, ?)",
-        (gd_account_id, "mute", "None", 0, "mute")
+        (gd_account_id, "mute", "None", 0, "mute"),
     )
     punishment_id = globed_curr.lastrowid
 

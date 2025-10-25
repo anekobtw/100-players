@@ -1,14 +1,31 @@
 import asyncio
 import os
 
+import aiohttp
 from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command, CommandStart
 from aiogram.fsm.storage.memory import MemoryStorage
 from dotenv import load_dotenv
-import aiohttp
+from fastapi import FastAPI
+from pydantic import BaseModel
 
 import database
+
+app = FastAPI()
+
+
+class RequestData(BaseModel):
+    admin_name: str
+    user_id: str
+
+
+@app.post("/request")
+async def handle_request(data: RequestData):
+    return {
+        "message": f"Request received from {data.admin_name} for user {data.user_id}"
+    }
+
 
 router = Router()
 
