@@ -1,5 +1,5 @@
 {
-	"geode": "4.6.3",
+	"geode": "4.9.0",
 	"gd": {
 		"win": "2.2074",
 		"android": "2.2074",
@@ -12,20 +12,20 @@
 	"developer": "anekobtw",
 	"description": "",
 	"dependencies": {
-		"dankmeme.globed2": {
+    "dankmeme.globed2": {
 			"importance": "required",
-			"version": ">=1.8.5"
+			"version": ">=1.8.6"
 		},
 		"geode.custom-keybinds": {
 			"importance": "required",
-			"version": ">=1.10.4"
+			"version": ">=1.11.0"
 		}
 	},
 	"settings": {
 		"server-url": {
 			"type": "string",
 			"name": "Server URL",
-			"default": "http://185.185.71.93:2000"
+			"default": "http://0.0.0.0:4203"
 		}
 	},
 	"resources": {
@@ -36,3 +36,4 @@
 		]
 	}
 }
+

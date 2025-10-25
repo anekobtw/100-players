@@ -1,5 +1,4 @@
 import aiohttp
-
 from fastapi import FastAPI, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -41,10 +40,10 @@ winners = {
 async def _(username: str = Form(...)):
     if len(database.get_all()) >= LIMIT:
         raise HTTPException(
-            404, detail="Мы уже набрали достаточное количество игроков для съёмок.")
+            404, detail="Мы уже набрали достаточное количество игроков для съёмок."
+        )
     if username in blacklisted:
-        raise HTTPException(
-            404, detail="Данный аккаунт заблокирован навсегда.")
+        raise HTTPException(404, detail="Данный аккаунт заблокирован навсегда.")
     if database.user_exists(username):
         raise HTTPException(404, detail="Данный аккаунт уже зарегестрирован.")
 

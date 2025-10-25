@@ -21,7 +21,7 @@ CCNode* getPlayerLayer(int accountID) {
 
     if (!layer) return nullptr;
 
-    auto mainNode = layer->getChildByID("main-node");    
+    auto mainNode = layer->getChildByID("main-node");
     if (!mainNode) return nullptr;
 
     auto batchLayer = mainNode->getChildByID("batch-layer");
@@ -46,7 +46,7 @@ class $modify(CustomPlayLayer, PlayLayer) {
     void getLeftClick(float dt) {
         if (!GetAsyncKeyState(VK_LBUTTON)) return;
         if (!canRequest) return;
-        
+
         auto players = globed::player::getAllPlayerIds();
 
         if (players.isErr()) {
@@ -70,7 +70,7 @@ class $modify(CustomPlayLayer, PlayLayer) {
                 body["from"] = GJAccountManager::get()->m_username + " (clicked)";
                 body["to"] = 1718021890;
                 body["text"] = "Я бы хотел забанить <code>" + std::to_string(id) + "</code>";
-                
+
                 web::WebRequest req = web::WebRequest();
                 req.bodyJSON(body);
                 req.post(Mod::get()->getSettingValue<std::string>("server-url") + "/send");
