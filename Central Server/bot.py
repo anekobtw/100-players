@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import os
 
 import aiohttp
@@ -13,13 +14,16 @@ from pydantic import BaseModel
 
 import database
 
-app = FastAPI()
-
-
+# --- Config ---
 load_dotenv()
+logging.basicConfig(level=logging.INFO, format="[%(levelname)s]   %(message)s")
 API_TOKEN = os.getenv("TOKEN")
 bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 
+
+
+# --- API ---
+app = FastAPI()
 
 class RequestData(BaseModel):
     admin_name: str
@@ -28,13 +32,14 @@ class RequestData(BaseModel):
 
 @app.post("/request")
 async def handle_request(data: RequestData):
-    print(1)
     await bot.send_message(
         chat_id=1718021890,
         text=f"Request received from {data.admin_name} for user {data.user_id}",
     )
 
 
+
+# --- Bot ---
 router = Router()
 
 GROUP_URL = "https://t.me/+W90_vZ5EA-E2M2Qy"
@@ -42,7 +47,6 @@ REGISTER = False
 LIMIT = 200
 blacklisted = {"snownitt"}
 winners = {
-    "anekobtw",
     "zolotro",
     "mrmatras",
     "spookyz228",
@@ -71,7 +75,7 @@ async def start(message: types.Message):
 @router.message(Command("set"))
 async def _(message: types.Message):
     nickname = message.text[5:]
-    print(nickname)
+    logging.info(f"Попытка регистрации от {nickname}")
 
     if not nickname:
         return await message.answer("❌ Укажи никнейм:\n<code>/set DimaNelis</code>")
@@ -116,17 +120,13 @@ async def _(message: types.Message):
 
 
 async def start_bot():
-    print("[INFO] Starting Telegram bot...")
-
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
-
     await dp.start_polling(bot)
 
 
 async def start_api():
-    print("[INFO] Starting FastAPI app...")
-    config = uvicorn.Config(app, host="127.0.0.1", port=4203, loop="asyncio")
+    config = uvicorn.Config(app, host="0.0.0.0", port=4200, loop="asyncio")
     server = uvicorn.Server(config)
     await server.serve()
 
