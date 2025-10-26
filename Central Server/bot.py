@@ -2,6 +2,7 @@ import asyncio
 import os
 
 import aiohttp
+import uvicorn
 from aiogram import Bot, Dispatcher, F, Router, types
 from aiogram.client.default import DefaultBotProperties
 from aiogram.filters import Command, CommandStart
@@ -15,6 +16,11 @@ import database
 app = FastAPI()
 
 
+load_dotenv()
+API_TOKEN = os.getenv("TOKEN")
+bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
+
+
 class RequestData(BaseModel):
     admin_name: str
     user_id: str
@@ -22,16 +28,18 @@ class RequestData(BaseModel):
 
 @app.post("/request")
 async def handle_request(data: RequestData):
-    return {
-        "message": f"Request received from {data.admin_name} for user {data.user_id}"
-    }
+    print(1)
+    await bot.send_message(
+        chat_id=1718021890,
+        text=f"Request received from {data.admin_name} for user {data.user_id}",
+    )
 
 
 router = Router()
 
-GROUP_URL = ""
+GROUP_URL = "https://t.me/+W90_vZ5EA-E2M2Qy"
 REGISTER = False
-LIMIT = 150
+LIMIT = 200
 blacklisted = {"snownitt"}
 winners = {
     "anekobtw",
@@ -89,7 +97,7 @@ async def _(message: types.Message):
     )
 
     await message.answer(
-        "✅ Аккаунт успешно добавлен в вайтлист! Ожидайте будущих инструкций в группе.\n\n👉 Ссылка на группу: {GROUP_URL}\n\n<b>❗ ВАЖНО:</b> Успейте зайти на сервер до начала съёмок — после старта войти не сможет никто, даже из вайтлиста!"
+        f"✅ Аккаунт успешно добавлен в вайтлист! Ожидайте будущих инструкций в группе.\n\n👉 Ссылка на группу: {GROUP_URL}\n\n<b>❗ ВАЖНО:</b> Успейте зайти на сервер до начала съёмок — после старта войти не сможет никто, даже из вайтлиста!"
     )
 
 
@@ -107,15 +115,27 @@ async def _(message: types.Message):
     await message.answer("Набор закрыт!")
 
 
-async def main():
-    load_dotenv()
-    API_TOKEN = os.getenv("TOKEN")
+async def start_bot():
+    print("[INFO] Starting Telegram bot...")
 
-    bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
 
     await dp.start_polling(bot)
+
+
+async def start_api():
+    print("[INFO] Starting FastAPI app...")
+    config = uvicorn.Config(app, host="127.0.0.1", port=4203, loop="asyncio")
+    server = uvicorn.Server(config)
+    await server.serve()
+
+
+async def main():
+    await asyncio.gather(
+        start_bot(),
+        start_api(),
+    )
 
 
 if __name__ == "__main__":

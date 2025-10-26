@@ -39,13 +39,14 @@ class $modify(CustomPlayLayer, PlayLayer) {
     void checkForHiding(float dt) {
         auto self = GJBaseGameLayer::get()->m_player1;
         auto players = globed::player::getAllPlayerIds();
-        auto selfBox = self->getOrientedBox();
+        auto selfPos = self->getParent()->convertToWorldSpace(self->getPosition());
 
         for (int id : players.unwrap()) {
             auto playerobject = globed::player::getPlayerObjectsForId(id);
             auto [p1, p2] = playerobject.unwrap();
+            auto p1Pos = p1->getParent()->convertToWorldSpace(p1->getPosition());
 
-            if (selfBox->overlaps(p1->getOrientedBox()) && getPlayerLayer(id)->isVisible() && canRequest) {
+            if ((p1Pos.x - selfPos.x < 15) && (p1Pos.y - selfPos.y < 15) && getPlayerLayer(id)->isVisible() && canRequest) {
                 FMODAudioEngine::get()->playEffect("kill.mp3"_spr);
                 getPlayerLayer(id)->setVisible(false);
                 p1->playDeathEffect();
@@ -56,8 +57,11 @@ class $modify(CustomPlayLayer, PlayLayer) {
                 body["admin_name"] = GJAccountManager::get()->m_username;
                 body["user_id"] = std::to_string(id);
 
+                std::string url = Mod::get()->getSettingValue<std::string>("server-url") + "/request";
+                log::info("Sending POST to {}", url);
+
                 req.bodyJSON(body);
-                req.post(Mod::get()->getSettingValue<std::string>("server-url") + "/request");
+                req.post(url);
             }
         }
     }
