@@ -39,14 +39,13 @@ class $modify(CustomPlayLayer, PlayLayer) {
     void checkForHiding(float dt) {
         auto self = GJBaseGameLayer::get()->m_player1;
         auto players = globed::player::getAllPlayerIds();
-        auto selfPos = self->getParent()->convertToWorldSpace(self->getPosition());
+        auto selfBox = self->getOrientedBox();
 
         for (int id : players.unwrap()) {
             auto playerobject = globed::player::getPlayerObjectsForId(id);
             auto [p1, p2] = playerobject.unwrap();
-            auto p1Pos = p1->getParent()->convertToWorldSpace(p1->getPosition());
 
-            if ((p1Pos.x - selfPos.x < 15) && (p1Pos.y - selfPos.y < 15) && getPlayerLayer(id)->isVisible() && canRequest) {
+            if (selfBox->overlaps(p1->getOrientedBox()) && getPlayerLayer(id)->isVisible() && canRequest) {
                 FMODAudioEngine::get()->playEffect("kill.mp3"_spr);
                 getPlayerLayer(id)->setVisible(false);
                 p1->playDeathEffect();
