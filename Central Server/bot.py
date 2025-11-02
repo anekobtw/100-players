@@ -14,7 +14,6 @@ from pydantic import BaseModel
 
 import database
 
-
 # --- Config ---
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s]   %(message)s")
@@ -22,9 +21,9 @@ API_TOKEN = os.getenv("TOKEN")
 bot = Bot(token=API_TOKEN, default=DefaultBotProperties(parse_mode="HTML"))
 
 
-
 # --- API ---
 app = FastAPI()
+
 
 class RequestData(BaseModel):
     admin_name: str
@@ -39,9 +38,9 @@ async def handle_request(data: RequestData) -> None:
     )
 
 
-
 # --- Bot ---
 router = Router()
+
 
 class BotState:
     group_url = "https://t.me/+W90_vZ5EA-E2M2Qy"
@@ -68,12 +67,20 @@ async def fetch_profile(nickname: str) -> dict | None:
 
 @router.message(CommandStart())
 async def start(message: types.Message) -> None:
-    kb = types.InlineKeyboardMarkup(inline_keyboard=[
-        [
-            types.InlineKeyboardButton(text="🎥  Учавствовать в видео", url='https://t.me/players_100_bot?text=/set%20твой_никнейм'),
-            types.InlineKeyboardButton(text="✉  Обратная связь️", url="https://t.me/players_100_bot/?text=/support%20твой_вопрос"),
+    kb = types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                types.InlineKeyboardButton(
+                    text="🎥  Учавствовать в видео",
+                    url="https://t.me/players_100_bot?text=/set%20твой_никнейм",
+                ),
+                types.InlineKeyboardButton(
+                    text="✉  Обратная связь️",
+                    url="https://t.me/players_100_bot/?text=/support%20твой_вопрос",
+                ),
+            ]
         ]
-    ])
+    )
 
     await message.answer_photo(
         photo=types.FSInputFile("pfp.png"),
@@ -82,7 +89,6 @@ async def start(message: types.Message) -> None:
     )
 
 
-        
 @router.message(Command("set"))
 async def _(message: types.Message) -> types.Message | None:
     nickname = message.text[5:]
@@ -122,7 +128,16 @@ async def support(message: types.Message, command: Command) -> None:
         await message.answer("❌ Пожалуйста, введите сообщение после команды /support.")
         return
 
-    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Ответить", url=f"https://t.me/players_100_bot?text=/reply%20{message.from_user.id}%20")]])
+    kb = types.InlineKeyboardMarkup(
+        inline_keyboard=[
+            [
+                types.InlineKeyboardButton(
+                    text="Ответить",
+                    url=f"https://t.me/players_100_bot?text=/reply%20{message.from_user.id}%20",
+                )
+            ]
+        ]
+    )
 
     await bot.send_message(
         chat_id=1718021890,
@@ -130,7 +145,9 @@ async def support(message: types.Message, command: Command) -> None:
         reply_markup=kb,
     )
 
-    await message.answer("❤️ <b>Спасибо за ваше сообщение!</b> Мы обязательно рассмотрим его в ближайшее время.")
+    await message.answer(
+        "❤️ <b>Спасибо за ваше сообщение!</b> Мы обязательно рассмотрим его в ближайшее время."
+    )
 
 
 @router.message(F.from_user.id == 1718021890, Command("reply"))
