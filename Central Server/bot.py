@@ -35,7 +35,7 @@ class RequestData(BaseModel):
 async def handle_request(data: RequestData) -> None:
     await bot.send_message(
         chat_id=1718021890,
-        text=f"Request received from {data.admin_name} for user {data.user_id}",
+        text=f"<b>{data.admin_name}</b> просит забанить <code>{data.user_id}</code>",
     )
 
 
