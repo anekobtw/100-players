@@ -70,8 +70,8 @@ async def fetch_profile(nickname: str) -> dict | None:
 async def start(message: types.Message) -> None:
     kb = types.InlineKeyboardMarkup(inline_keyboard=[
         [
-            types.InlineKeyboardButton(text="🎥  Учавствовать в видео", url='https://t.me/players_100_bot?text=/set%20%D1%82%D0%B2%D0%BE%D0%B9_%D0%BD%D0%B8%D0%BA%D0%BD%D0%B5%D0%B9%D0%BC'),
-            types.InlineKeyboardButton(text="✉  Обратная связь️", url="https://t.me/players_100_bot/?text=/support%20%D1%82%D0%B2%D0%BE%D0%B9_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81"),
+            types.InlineKeyboardButton(text="🎥  Учавствовать в видео", url='https://t.me/players_100_bot?text=/set%20твой_никнейм'),
+            types.InlineKeyboardButton(text="✉  Обратная связь️", url="https://t.me/players_100_bot/?text=/support%20твой_вопрос"),
         ]
     ])
 
@@ -114,6 +114,35 @@ async def _(message: types.Message) -> types.Message | None:
     await message.answer(
         f"✅ Аккаунт успешно добавлен в вайтлист! Ожидайте будущих инструкций в группе.\n\n👉 Ссылка на группу: {BotState.group_url}\n\n<b>❗ ВАЖНО:</b> Успейте зайти на сервер до начала съёмок — после старта войти не сможет никто, даже из вайтлиста!"
     )
+
+
+@router.message(Command("support"))
+async def support(message: types.Message, command: Command) -> None:
+    if not command.args:
+        await message.answer("❌ Пожалуйста, введите сообщение после команды /support.")
+        return
+
+    kb = types.InlineKeyboardMarkup(inline_keyboard=[[types.InlineKeyboardButton(text="Ответить", url=f"https://t.me/players_100_bot?text=/reply%20{message.from_user.id}%20")]])
+
+    await bot.send_message(
+        chat_id=1718021890,
+        text=f"Новое сообщение от <b>{message.from_user.full_name}</b> (@{message.from_user.username} | <code>{message.from_user.id}</code>):\n\n{command.args}",
+        reply_markup=kb,
+    )
+
+    await message.answer("❤️ <b>Спасибо за ваше сообщение!</b> Мы обязательно рассмотрим его в ближайшее время.")
+
+
+@router.message(F.from_user.id == 1718021890, Command("reply"))
+async def _(message: types.Message, command: Command) -> None:
+    user_id, *reply_text = command.args.split()
+
+    await bot.send_message(
+        chat_id=int(user_id),
+        text=f"📩 <b>Ответ от администрации:</b>\n\n{" ".join(reply_text)}",
+    )
+
+    await message.answer("✅ Сообщение успешно отправлено пользователю.")
 
 
 @router.message(F.from_user.id == 1718021890, Command("open"))
