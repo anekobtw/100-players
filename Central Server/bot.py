@@ -14,6 +14,7 @@ from pydantic import BaseModel
 
 import database
 
+
 # --- Config ---
 load_dotenv()
 logging.basicConfig(level=logging.INFO, format="[%(levelname)s]   %(message)s")
@@ -31,7 +32,7 @@ class RequestData(BaseModel):
 
 
 @app.post("/request")
-async def handle_request(data: RequestData):
+async def handle_request(data: RequestData) -> None:
     await bot.send_message(
         chat_id=1718021890,
         text=f"Request received from {data.admin_name} for user {data.user_id}",
@@ -42,17 +43,18 @@ async def handle_request(data: RequestData):
 # --- Bot ---
 router = Router()
 
-GROUP_URL = "https://t.me/+W90_vZ5EA-E2M2Qy"
-REGISTER = False
-LIMIT = 200
-blacklisted = {"snownitt"}
-winners = {
-    "zolotro",
-    "mrmatras",
-    "spookyz228",
-    "maskagd",
-    "forty0ne",
-}
+class BotState:
+    group_url = "https://t.me/+W90_vZ5EA-E2M2Qy"
+    registration = False
+    limit = 250
+    blacklisted = {"snownitt"}
+    winners = {
+        "zolotro",
+        "mrmatras",
+        "spookyz228",
+        "maskagd",
+        "forty0ne",
+    }
 
 
 async def fetch_profile(nickname: str) -> dict | None:
@@ -65,28 +67,37 @@ async def fetch_profile(nickname: str) -> dict | None:
 
 
 @router.message(CommandStart())
-async def start(message: types.Message):
-    await message.answer(
-        "Привет! Чтобы участвовать в видео, напиши команду:\n"
-        "<code>/set твой_никнейм</code>"
+async def start(message: types.Message) -> None:
+    kb = types.InlineKeyboardMarkup(inline_keyboard=[
+        [
+            types.InlineKeyboardButton(text="🎥  Учавствовать в видео", url='https://t.me/players_100_bot?text=/set%20%D1%82%D0%B2%D0%BE%D0%B9_%D0%BD%D0%B8%D0%BA%D0%BD%D0%B5%D0%B9%D0%BC'),
+            types.InlineKeyboardButton(text="✉  Обратная связь️", url="https://t.me/players_100_bot/?text=/support%20%D1%82%D0%B2%D0%BE%D0%B9_%D0%B2%D0%BE%D0%BF%D1%80%D0%BE%D1%81"),
+        ]
+    ])
+
+    await message.answer_photo(
+        photo=types.FSInputFile("pfp.png"),
+        caption="👋 <b>Привет! Спасибо, что захотел поучавствовать в видео!</b>\n\nПожалуйста, выбери одно из действий:",
+        reply_markup=kb,
     )
 
 
+        
 @router.message(Command("set"))
-async def _(message: types.Message):
+async def _(message: types.Message) -> types.Message | None:
     nickname = message.text[5:]
     logging.info(f"Попытка регистрации от {nickname}")
 
     if not nickname:
         return await message.answer("❌ Укажи никнейм:\n<code>/set DimaNelis</code>")
 
-    if not REGISTER:
+    if not BotState.registration:
         return await message.answer("❌ Набор ещё не запущен.")
 
-    if len(database.get_all()) >= LIMIT:
+    if len(database.get_all()) >= BotState.limit:
         return await message.answer("❌ Мы набрали достаточно участников для съёмок.")
 
-    if nickname in blacklisted:
+    if nickname in BotState.blacklisted:
         return await message.answer("❌ Этот аккаунт заблокирован навсегда.")
 
     data = await fetch_profile(nickname)
@@ -97,35 +108,33 @@ async def _(message: types.Message):
     database.whitelist(
         gd_account_id=data["accountID"],
         gd_username=data["username"],
-        is_winner=nickname.lower() in winners,
+        is_winner=nickname.lower() in BotState.winners,
     )
 
     await message.answer(
-        f"✅ Аккаунт успешно добавлен в вайтлист! Ожидайте будущих инструкций в группе.\n\n👉 Ссылка на группу: {GROUP_URL}\n\n<b>❗ ВАЖНО:</b> Успейте зайти на сервер до начала съёмок — после старта войти не сможет никто, даже из вайтлиста!"
+        f"✅ Аккаунт успешно добавлен в вайтлист! Ожидайте будущих инструкций в группе.\n\n👉 Ссылка на группу: {BotState.group_url}\n\n<b>❗ ВАЖНО:</b> Успейте зайти на сервер до начала съёмок — после старта войти не сможет никто, даже из вайтлиста!"
     )
 
 
 @router.message(F.from_user.id == 1718021890, Command("open"))
-async def _(message: types.Message):
-    global REGISTER
-    REGISTER = True
+async def _(message: types.Message) -> None:
+    BotState.registration = True
     await message.answer("Набор открыт!")
 
 
 @router.message(F.from_user.id == 1718021890, Command("close"))
-async def _(message: types.Message):
-    global REGISTER
-    REGISTER = False
+async def _(message: types.Message) -> None:
+    BotState.registration = False
     await message.answer("Набор закрыт!")
 
 
-async def start_bot():
+async def start_bot() -> None:
     dp = Dispatcher(storage=MemoryStorage())
     dp.include_router(router)
     await dp.start_polling(bot)
 
 
-async def start_api():
+async def start_api() -> None:
     config = uvicorn.Config(app, host="0.0.0.0", port=4200, loop="asyncio")
     server = uvicorn.Server(config)
     await server.serve()
