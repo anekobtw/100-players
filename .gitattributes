@@ -1,1 +1,1 @@
-*.ts linguist-detectable=false
+CentralServer/website/** linguist-detectable=false
